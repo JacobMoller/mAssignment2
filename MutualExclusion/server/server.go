@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"log"
 	"mAssignment2/MutualExclusion/protobuf"
+	"math/rand"
 	"net"
+	"strconv"
 	"sync"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -42,19 +45,21 @@ func serverManipulationRoutine() {
 	for {
 		clientName := takeNext()
 		if clientName != "" {
-			fmt.Println("Manipulating for " + clientName)
+			fmt.Println("MANIPULATING (clientName: \"" + clientName + "\")")
 			//If anyone is waiting, take the next from the queue
 			manipulateCriticalValue()
+			printQueue()
 		}
+		time.Sleep(time.Duration(rand.Intn(4)) * time.Second)
 	}
 }
 
 func (s *server) NewParticipant(ctx context.Context, in *protobuf.NewClientRequest) (*protobuf.NewClientReply, error) {
 	if alreadyExists(in.ClientName) {
-		fmt.Println("Client denied: " + in.ClientName)
+		fmt.Println("CLIENT DENIED (clientName: \"" + in.ClientName + "\")")
 		return &protobuf.NewClientReply{}, errors.New("USERNAME IS ALREADY IN USE")
 	} else {
-		fmt.Println("New Client with name: " + in.ClientName)
+		fmt.Println("NEW CLIENT (clientName: \"" + in.ClientName + "\")")
 		clients = append(clients, in.ClientName)
 		return &protobuf.NewClientReply{}, nil
 	}
@@ -62,12 +67,7 @@ func (s *server) NewParticipant(ctx context.Context, in *protobuf.NewClientReque
 
 func (s *server) ClientManipulation(ctx context.Context, in *protobuf.ClientManipulationRequest) (*protobuf.ClientManipulationReply, error) {
 	queue = append(queue, in.ClientName)
-	fmt.Print("[")
-	for i := 0; i < len(queue); i++ {
-		fmt.Print(queue[i] + ", ")
-	}
-	fmt.Print("]")
-	fmt.Println()
+	printQueue()
 	return &protobuf.ClientManipulationReply{}, nil
 }
 
@@ -82,6 +82,18 @@ func alreadyExists(clientName string) bool {
 	return existsInClients
 }
 
+func printQueue() {
+	fmt.Print("[")
+	for i := 0; i < len(queue); i++ {
+		fmt.Print(queue[i])
+		if i != len(queue)-1 {
+			fmt.Print(", ")
+		}
+	}
+	fmt.Print("]")
+	fmt.Println()
+}
+
 func takeNext() string {
 	for len(queue) > 0 {
 		value := queue[0]
@@ -94,8 +106,8 @@ func takeNext() string {
 func manipulateCriticalValue() {
 	mu.Lock()
 	criticalValue++
+	fmt.Println("CRITICAL VALUE: " + strconv.Itoa(criticalValue))
 	mu.Unlock()
-	fmt.Println(criticalValue)
 }
 
 /*
