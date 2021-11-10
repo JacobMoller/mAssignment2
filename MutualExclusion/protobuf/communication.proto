@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package communication;
+option go_package = "https://github.com/JacobMoller/mAssignment2;protobuf";
+
+service MutualExclusion {
+  // Sends a greeting for a new participant
+  rpc NewParticipant (NewClientRequest) returns (NewClientReply) {}
+  
+  //Client wants to manipulate
+  rpc ClientManipulation (ClientManipulationRequest) returns (ClientManipulationReply) {}
+}
+
+// The request message containing the client's name.
+message NewClientRequest {
+  string ClientName = 1;
+}
+
+// The response message containing if the addition was succesful
+message NewClientReply {
+}
+
+message ClientManipulationRequest {
+  string ClientName = 1;
+}
+
+message ClientManipulationReply {}
