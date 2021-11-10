@@ -21,7 +21,7 @@ func main() {
 	text, _ := reader.ReadString('\n')
 	name := strings.Replace(text, "\n", "", 1)
 
-	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock()) //maybe it has to be: localhost:8080
+	conn, err := grpc.Dial(":8080", grpc.WithInsecure(), grpc.WithBlock()) 
 	if err != nil {                                                        //error can not establish connection
 		log.Fatalf("did not connect: %v", err)
 	}
