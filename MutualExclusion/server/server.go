@@ -74,7 +74,6 @@ func (s *server) ClientManipulation(ctx context.Context, in *protobuf.ClientMani
 func alreadyExists(clientName string) bool {
 	var existsInClients = false
 	for i := 0; i < len(clients); i++ {
-		fmt.Println(clients[i] == clientName)
 		if clients[i] == clientName {
 			existsInClients = true
 		}
